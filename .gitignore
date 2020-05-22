@@ -1,3 +1,4 @@
 com/*
 .vscode
 .git
+__pycache__
