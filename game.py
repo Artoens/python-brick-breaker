@@ -7,6 +7,7 @@ import copy
 
 
 class Game(tk.Canvas):
+    keyPressed = []
     textDisplayed = False
     linesNb = 20
     seconds = 0
@@ -105,7 +106,10 @@ class Game(tk.Canvas):
             self.displayText("GAME ENDED IN\n" + "%02d mn %02d sec %02d" % (int(
                 self.seconds)//60, int(self.seconds) % 60, (self.seconds*100) % 100), hide=False)
             return
-        self.displayText("LEVEL\n"+str(self.levelNum))
+        self.displayText("LEVEL\n"+str(self.levelNum), callback= self.throw_ball())
+
+    def throw_ball(self):
+        self.ballThrown = True
 
     # This method, called each 1/60 of seconde, computes again
     # the properties of all elements (positions, collisions, effects...).
@@ -119,9 +123,9 @@ class Game(tk.Canvas):
         self.updateEffects()
 
         if self.keyPressed[0]:
-            self.moveBar(-game.barSpeed)
+            self.moveBar(-self.barSpeed)
         elif self.keyPressed[1]:
-            self.moveBar(game.barSpeed)
+            self.moveBar(self.barSpeed)
 
         if not(self.textDisplayed):
             if self.won:
@@ -197,6 +201,8 @@ class Game(tk.Canvas):
                 # If the brick is yellow (or an other color except red/orange), it is destroyed.
                 else:
                     self.score += 1
+                    print(self.score)
+                    print(self.seconds)
                     self.delete(self.bricks[i])
                     del self.bricks[i]
             i += 1
@@ -310,38 +316,3 @@ class Game(tk.Canvas):
             collisionCounter = 4
 
         return collisionCounter
-
-
-# This function is called on key down.
-def eventsPress(event):
-    global game, hasEvent
-
-    if event.keysym == "Left":
-        game.keyPressed[0] = 1
-    elif event.keysym == "Right":
-        game.keyPressed[1] = 1
-    elif event.keysym == "space" and not(game.textDisplayed):
-        game.ballThrown = True
-
-# This function is called on key up.
-
-
-def eventsRelease(event):
-    global game, hasEvent
-
-    if event.keysym == "Left":
-        game.keyPressed[0] = 0
-    elif event.keysym == "Right":
-        game.keyPressed[1] = 0
-
-
-# Initialization of the window
-root = tk.Tk()
-root.title("Brick Breaker")
-root.resizable(0, 0)
-root.bind("<Key>", eventsPress)
-root.bind("<KeyRelease>", eventsRelease)
-
-# Starting up of the game
-game = Game(root)
-root.mainloop()
