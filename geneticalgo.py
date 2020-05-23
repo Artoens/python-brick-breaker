@@ -14,6 +14,7 @@ import time
 from collections import namedtuple
 import argparse
 
+
 class Master:
     def __init__(self, master):
         self.population = []
@@ -24,7 +25,6 @@ class Master:
             root = tk.Tk()
             root.title("Brick Breaker")
             root.resizable(0, 0)
-            # newgame = tk.Toplevel(root)
             game = g.Game(root)
             p = Player(game)
             p.play()
@@ -34,26 +34,21 @@ class Master:
         self.close_windows()
         while any(p.playing for p in self.population):
             print('Running', [p.playing for p in self.population])
-        
+
         for p in self.population:
             p.game.quit()
         for p in self.population:
             print(p.score)
-        
 
-
-        
-    
     def close_windows(self):
         self.master.destroy()
 
 
 class Player():
-    
+
     genetic_pool = ['Left', 'Right', None]
 
-    
-    def __init__(self, game, genome = None):
+    def __init__(self, game, genome=None):
         self.game = game
         self.playing = False
         if genome is not None:
@@ -73,12 +68,12 @@ class Player():
         while self.game.running:
             for gene in self.genome:
                 self.__applyGene(gene)
-            
+
             new_gene = self.createRandomGene()
             self.__applyGene(new_gene)
             self.genome.append(new_gene)
         self.playing = False
-    
+
     def __applyGene(self, gene):
         if gene.Key == 'Left':
             self.game.keyPressed[0] = True
@@ -95,15 +90,13 @@ class Player():
         return Gene(key, t)
 
 
-
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('size', help='Size of the population (integer)')
-    parser.add_argument('-f', '--file', metavar='PATH', help='path to the file where the bests candidates are stored')
+    parser.add_argument('-f', '--file', metavar='PATH',
+                        help='path to the file where the bests candidates are stored')
     args = parser.parse_args()
-    
+
     try:
         pop_size = int(args.size)
     except:
@@ -112,7 +105,4 @@ if __name__ == '__main__':
     root = tk.Tk()
     app = Master(root)
     root.mainloop()
-
-
-
 
