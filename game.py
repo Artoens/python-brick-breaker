@@ -7,7 +7,7 @@ import copy
 
 
 class Game(tk.Canvas):
-    keyPressed = []
+    running=False
     textDisplayed = False
     linesNb = 20
     seconds = 0
@@ -33,7 +33,6 @@ class Game(tk.Canvas):
         "y": "#f1c40f",
         "o": "#e67e22",
     }
-    score = 0
 
     # Screen properties
     screenHeight = 500
@@ -43,7 +42,12 @@ class Game(tk.Canvas):
     def __init__(self, root):
         tk.Canvas.__init__(self, root, bg="#ffffff", bd=0, highlightthickness=0,
                            relief="ridge", width=self.screenWidth, height=self.screenHeight)
+        self.running = True
         self.pack()
+        self.keyPressed = []
+        self.score = 0
+        self.scoreContainer = self.create_text(
+          0, self.screenHeight*9/10, text="Score = " + str(self.score), fill="#cccccc", font=("Arial", 12), anchor=tk.W)
         self.timeContainer = self.create_text(
             self.screenWidth/2, self.screenHeight*4/5, text="00:00:00", fill="#cccccc", font=("Arial", 30), justify="center")
         self.shield = self.create_rectangle(0, 0, 0, 0, width=0)
@@ -104,7 +108,7 @@ class Game(tk.Canvas):
         # If there is not any more level to load, the game is finished and the end of game screen is displayed (with player time).
         except IOError as e:
             self.displayText("GAME ENDED IN\n" + "%02d mn %02d sec %02d" % (int(
-                self.seconds)//60, int(self.seconds) % 60, (self.seconds*100) % 100), hide=False)
+                self.seconds)//60, int(self.seconds) % 60, (self.seconds*100) % 100), hide=False, callback=self.quitGame())
             return
         self.displayText("LEVEL\n"+str(self.levelNum), callback= self.throw_ball())
 
@@ -132,10 +136,14 @@ class Game(tk.Canvas):
                 self.displayText(
                     "WON!", callback=lambda: self.level(self.levelNum+1))
             elif self.losed:
-                self.displayText(
-                    "LOST!", callback=lambda: self.level(self.levelNum))
+                self.displayText("LOST!", callback=lambda : self.quitGame())
 
         self.after(int(1000/60), self.nextFrame)
+
+
+    def quitGame(self):
+        self.running = False
+        # self.destroy()
 
     # This method, called when left or right arrows are pressed,
     # moves "x" pixels horizontally the bar, keeping it in the screen.
@@ -201,8 +209,7 @@ class Game(tk.Canvas):
                 # If the brick is yellow (or an other color except red/orange), it is destroyed.
                 else:
                     self.score += 1
-                    print(self.score)
-                    print(self.seconds)
+                    self.itemconfig(self.scoreContainer, text="Score = " + str(self.score))
                     self.delete(self.bricks[i])
                     del self.bricks[i]
             i += 1
