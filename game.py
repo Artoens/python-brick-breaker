@@ -40,6 +40,7 @@ class Game(tk.Canvas):
 
     # This method initializes some attributes: the ball, the bar...
     def __init__(self, root):
+        self.root = root
         tk.Canvas.__init__(self, root, bg="#ffffff", bd=0, highlightthickness=0,
                            relief="ridge", width=self.screenWidth, height=self.screenHeight)
         self.running = True
@@ -137,8 +138,8 @@ class Game(tk.Canvas):
                     "WON!", callback=lambda: self.level(self.levelNum+1))
             elif self.losed:
                 self.displayText("LOST!", callback=lambda : self.quitGame())
-
-        self.after(int(1000/60), self.nextFrame)
+        if self.running:
+            self.after(int(1000/60), self.nextFrame)
 
 
     def quitGame(self):
@@ -296,9 +297,9 @@ class Game(tk.Canvas):
         self.text = self.create_text(
             self.screenWidth/2, self.screenHeight/2, text=text, font=("Arial", 25), justify="center")
         if hide:
-            self.after(3000, self.hideText)
+            self.after(0, self.hideText)
         if callback != None:
-            self.after(3000, callback)
+            self.after(0, callback)
 
     # This method deletes the text display.
     def hideText(self):
